@@ -21,4 +21,5 @@ environment:
 
 lint:
 	# TODO:  figure out flymake or just get this to run epylint src/*.py
-	cd src && epylint *.py
+	cd src && epylint *.py -E   # look for errors first
+	cd src && epylint *.py -r n || true  # show warnings but continue
