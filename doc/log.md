@@ -11,6 +11,6 @@ Need to start a module I guess.
 
 Spent an hour on devEnv again.   Still can't get pylint doing the right thing.
 
-Linked a readme to the plan doc.  Made a simple integration test, but no test yet.
+Linked a readme to the plan doc.  Added integration test to makes.
 
-starting.
+Even though HFS+ is not case sensitive, the import statement is.

@@ -7,11 +7,14 @@ all:   environment lint tests
 test_pass:
 	@echo "Empty test passes!"
 
+test_add_two:
+	cd src && python add_two.py
+
 # This is here just to have a failed make.  It is not in the test list.
 test_fail:
 	@echo "Should fail" && /usr/bin/false
 
-tests:  test_pass
+tests:  test_pass test_add_two
 
 environment:
 	source ~/.virtualenvs/big3/bin/activate
