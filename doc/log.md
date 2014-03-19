@@ -1,3 +1,32 @@
+Wednesday, March 19, 2014
+===
+
+Haven't been updating for a little while.  I spent a fun day updating
+my keyboard mappings to handle using the space bar a control key.  On
+the code, I'm both hung up on the tk grid control and on the need to
+do some refactoring.  Each subclass should implement its own logic for
+the walk through the spec, but I want to have the identification and
+chunking of the spec in a common place.  It's time to get the code
+into a more useful and testable form.  Time to break apart the
+modules.  Overall, my list of things to do with the code has gotten
+long enough it becomes tempting to put it aside.
+
+So here is the list: break out packages, rewrite the basic render
+logic, understand tk grids, make a testing subclass so I can write
+some tests, make many more usage examples, write an example for tk
+grid, write an example for add_two in flask, make a flask target,
+≤figure out how to test guis.
+
+It's an odd time for a project.  So, first step, get things into git.
+Second, work to have tests and builds do something.  Third, try to
+test what I have.  Then add.  I find I first want to much with my
+editor and made it use the system clipboard.
+
+So, let's start with git.  Then make all.
+
+
+
+
 Sunday, March 9, 2014
 -
 

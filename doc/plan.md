@@ -5,10 +5,15 @@ This is an itch I've been wanting to scratch for a while.   I want a introspecti
 
 In the simplest form, I'll have a non-blocking dialog type gui:
 
-     import pyUI
-     fields = [ ["Enter first number:", "{int number1}"], ["Enter second number", "{int number2}"] ]
-     output = pyUI.dialog(fields)
+     import pyUI as ui
+     fields = [["Enter first number:", "{[number1]:d}"],
+               ["Enter second number", "{[number2]:d}"]]
+     output = ui.dialog(fields)
      total = output["number1"] + output["number2"]
-     output = pyUI.dialog("Total value is " + total)
+     output = ui.dialog("Total value is {}".format(total))
 
-There is enough information here to do a simple Tcl/TK system.
+
+There is enough information here to do a simple Tcl/TK system.  I'm using the mini-language
+for format for specifying the inputs.
+
+)
