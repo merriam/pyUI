@@ -5,9 +5,10 @@ from tkinter import ttk
 
 root = Tk()
 
-style = ttk.Style().configure('My.TFrame', background=red)
+# Adding syle affects if it displays!
+#style = ttk.Style().configure('My.TFrame', background=red)
 content = ttk.Frame(root)
-frame = ttk.Frame(content, borderwidth=5, relief="sunken", width=200, height=100, style='My.TFrame')
+frame = ttk.Frame(content, borderwidth=5, relief="sunken", width=200, height=100)
 namelbl = ttk.Label(content, text="Name")
 name = ttk.Entry(content)
 
