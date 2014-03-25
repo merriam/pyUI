@@ -1,28 +1,29 @@
-""" PyUI Module for introspection based UI.
+""" base.py Base Class Module for introspection based UI.
 
-The plan is in docs/plan.md.   Additional comments are in docs/log.md or may the
-git commit messages. """
-
-# TODO, add module for what gets exported.
-
-from tkinter import Tk, BOTH, RIGHT, LEFT, RAISED, Label
-import tkinter
-from tkinter.ttk import Frame, Button, Style, Entry
+This defines the interface for subclasses.
+"""
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
 
+
+#=========== UTIL SECTION ==========================
+
 class except_pyUI(BaseException):
+    """ Superclass for all custom exceptions from this library """
     pass
 
 class except_pyUI_usage(except_pyUI):
+    """
     pass
 
-#====== Spec stuff
-# an Entry_spec, which may be a class later, is the minilanguage describing an entry.
-# For example, ":number" or ":number like 999".
-# Note that parsing it also requires looking at a current value:  we might infer a type.
+#=========== SPEC SECTION ==========================
 
+# A spec, which is a complex idea, includes the minilanguage describing an entry.
+# For example, ":number" or ":number like 999".
+#
+# The minilanguage has the idea of an "entry spec" which is simply
+# one entry item variable name, and is denoted as starting with a single colon.
 PREFIX = ":"
 
 def is_entry_spec(spec):
@@ -38,6 +39,7 @@ def test_is_entry():
     assert not is_entry_spec("::data")
     assert not is_entry_spec("A label")
     assert not is_entry_spec("foo:")
+    # TODO:  is ":2" a valid spec?   What does it mean?
 
 def parse_entry_spec(entry_spec):
     """ parse entry spec into dictionary of information """
@@ -54,7 +56,9 @@ def test_parse_entry_spec():
 
 
 def is_grid(spec):
-    """ return True for list of (lists of same length) """
+    """ return True for list of (lists of equal length).
+
+    That is, a regular, rectangular, grid of values. """
     if isinstance(spec, list) and isinstance(spec[0], list):
         target_length = len(spec[0])
         for item in spec[1:]:
@@ -83,24 +87,23 @@ def test_is_simple():
     assert not is_simple([])
     assert not is_simple({})
 
-
-#def raise_above_all(window):
-#    # doesn't work
-#    window.xattributes('-topmost', 1)
-#    window.attributes('-topmost', 0)
+############ BASE UI SECTION
 
 #===========  pyUI
-WINDOWING_SYSTEMS = ["tk", "text", "stub"]
-
-class pyUI(object):
-    """The pyUI gui abstract class.  Not directly usable: a subclass must
-    add the ui specific methods for preparing (during __init__),
+class Base(object):
+    """The pyUI gui base abstract class.  Not directly usable: a subclass
+    must add the ui specific methods for preparing (during __init__),
     concluding, and adding all the values.
 
     Its was a tough call to decide subclassing was the correct choice.  The
     trade-off of being able over-ride dialog() tipped the scales away from
     having a different class implement an interface.
 
+    TODO: new contract
+    The base class keeps the contract for all GUIs.
+
+    So, far, all UIs seem to have a workflow of a.  initialize system, b.  add widgets,
+    c.  run the mainloop, d.  return the values.  e..  shutdown the ui.
     """
 
     def __init__(self):
@@ -110,6 +113,7 @@ class pyUI(object):
 
         Every subclass must declare an __init__ method and then call this as
         part of the init.
+
         """
         self.values = {}
         self.previous_values = None
@@ -121,6 +125,7 @@ class pyUI(object):
         self = a subclass of pyUI.
         spec = mini-language for fields in dialog,
         current_values = dict of current values for fields
+        TODO:  should be a class method
         """
         self.previous_values = current_values
         # we prepared for adding items in the __init__() function.
@@ -130,7 +135,6 @@ class pyUI(object):
         else:
             return None
 
-
     def add_spec(self, spec):
         """ Add spec to current window or frame.
 
@@ -139,6 +143,8 @@ class pyUI(object):
 
         Another design trade-off:  this is a long function so that
         it recurses only from itself.
+
+        TODO:  rewrite
         """
         if isinstance(spec, list):
             if is_grid(spec):
@@ -237,8 +243,9 @@ def test_dialog_2():
 
 
 #======== pyUI_stub
-class pyUI_stub(pyUI):
-    """ A stub class for pyUI """
+class Stub(Base):
+    """ A stub class for pyUI.  It ignores the spec, and returns
+        a constant dictionary.   """
      # pylint: disable=abstract-method
     def dialog(self, spec, current_values=None):
         print(spec)
@@ -247,103 +254,7 @@ class pyUI_stub(pyUI):
         else:
             return {"number1": 5, "number2" : 8}
 
-#====== pyUI_echo
-class pyUI_echo(pyUI):
-    """ a text/terminal class for pyUI """
-
-    def __init__(self):
-        """ First step """
-        super().__init__()
-        self.indent = 0
-        self.section_start("pyUI_echo:  Preparing")
-
-    def emit(self, message):
-        print("{}{}".format(' ' * self.indent, message))
-
-    def section_start(self, message):
-        self.emit(">{}".format(message))
-        self.indent += 1
-
-    def section_end(self, message):
-        self.indent -= 1
-        self.emit("<{}".format(message))
-
-    def conclude(self):
-        """ Execute, after dialog adds all fields.  Sets self.values dict
-            for the return.  It seems more convenient to have self.values
-            than a return value.
-
-            Returns True on ok, or input accpted, and False on cancel or ignore
-            the page.  """
-        self.section_end("pyUI_echo:  Concluding")
-        return True
-
-    def add_entry_spec(self, spec):
-        """ Add an input, e.g., a string to fill in.  """
-        self.emit("INPUT: {}".format(spec))
-
-    def add_data_spec(self, spec):
-        """ Add a data spec, e.g., a label. """
-        self.emit("::{}".format(spec))
-
-    @contextmanager
-    def grid_spec(self, spec):
-        """ Context manager when adding an entire grid. """
-        self.section_start("Grid spec")
-        yield
-        self.section_end("Grid spec")
-
-    @contextmanager
-    def grid_row(self, spec):
-        """ Context manager when adding a row to a grid. """
-        self.section_start("Grid row")
-        yield
-        self.section_end("Grid row")
-
-    @contextmanager
-    def grid_item(self, spec):
-        """ Context manager when adding an item to a grid,
-            meaning one cell of one row. """
-        self.section_start("Grid item")
-        yield
-        self.section_end("Grid item")
-
-    @contextmanager
-    def list_spec(self, spec):
-        """ Context manager when adding a list . """
-        self.section_start("List spec")
-        yield
-        self.section_end("List spec")
-
-    @contextmanager
-    def list_item(self, spec):
-        """ Context manager when adding a single item on a list. """
-        self.section_start("List item")
-        yield
-        self.section_end("List item")
-
-    @contextmanager
-    def dict_spec(self, spec):
-        """ Context manager when adding a dict. """
-        self.section_start("dict spec")
-        yield
-        self.section_end("dict spec")
-
-    @contextmanager
-    def dict_key_value(self, key, value):
-        """ Context manager when adding a key, value pair to a dict. """
-        self.section_start("key value")
-        yield
-        self.section_end("key value")
-
-    @contextmanager
-    def dict_value(self, value):
-        """ Context manager when adding just the dict_value. """
-        self.section_start("value")
-        yield
-        self.section_end("value")
-
-#=== tk stuff
+#========= tk UI class
 def get_centering_geometry(width, height, screen_width, screen_height):
     """ return geometry string for given window and screen size """
     new_x = (screen_width - width) // 2
@@ -354,9 +265,7 @@ def test_get_centering_geometry():
     eq_(get_centering_geometry(100, 100, 400, 400), "100x100+150+150")
     eq_(get_centering_geometry(100, 200, 300, 400), "100x200+100+100")
 
-
- #====== pyUI_tk
-class pyUI_tk(pyUI):
+class pyUI_tk(Base):
     """ The specific pyUI for tk.  TODO:  make this pyUI.tk
 
      I will heed the advie of http://effbot.org/tkinterbook/grid.htm
@@ -525,13 +434,13 @@ class pyUI_tk(pyUI):
 
 def check_valid_pyUI_object(obj):
     """ make sure object has overriddent required virual methods. """
-    assert isinstance(obj, pyUI)
+    assert isinstance(obj, Base)
     required = ['__init__', 'conclude', 'grid_spec',
                 'grid_row', 'grid_item', 'list_spec', 'list_item',
                 'dict_spec', 'dict_key_value', 'dict_value',
                 'add_entry_spec', 'add_data_spec']
     for method in required:
-        assert hasattr(pyUI, method), "pyUI should have {}".format(method)
+        assert hasattr(Base, method), "pyUI should have {}".format(method)
         assert hasattr(obj, method)
         assert callable(getattr(obj, method))
         assert getattr(pyUI, method) != getattr(type(obj), method), \
@@ -539,9 +448,6 @@ def check_valid_pyUI_object(obj):
 
 def test_pyUI_tk_complete():
     check_valid_pyUI_object(pyUI_tk())
-
-def test_pyUI_echo_complete():
-    check_valid_pyUI_object(pyUI_echo())
 
 if __name__ == "__main__":
     except_pyUI_usage("You are trying to run the module.")

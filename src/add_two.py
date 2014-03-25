@@ -1,21 +1,25 @@
-""" Simple integration test to add two numbers """
+""" Simple integration test to add two numbers using several specific gui systems """
 
 import pyUI
+import pyUI.stub
+import pyUI.echo
+import pyUI.tk
+import pyUI.html
 
 def add_two(ui):
     """ Add two using the pyUI subclass given. """
     fields = [["Enter first number:", ":number1 is number"],
               ["Enter second number", ":number2 is number"]]
-    output = ui().dialog(fields)
+    output = ui.dialog(fields)
     if output:
         total = output["number1"] + output["number2"]
         output = ui().dialog("Total value is {}".format(total))
 
 if __name__ == "__main__":
     print("==== Next up:  Stub ===")
-    add_two(pyUI.pyUI_stub)
+    add_two(pyUI.Stub)
     print("==== Next up:  Echo ====")
-    add_two(pyUI.pyUI_echo)
+    add_two(pyUI.echo.Echo)
     print("==== Next up:  Tk ====")
     add_two(pyUI.pyUI_tk)
 
