@@ -22,7 +22,7 @@ Second, work to have tests and builds do something.  Third, try to
 test what I have.  Then add.  I find I first want to much with my
 editor and made it use the system clipboard.
 
-So, let's start with git.  Then make all.
+So, let's start with git.  Then make all.  Also, I need to rethink github.
 
 
 
