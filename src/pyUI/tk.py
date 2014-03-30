@@ -21,9 +21,9 @@ def test_get_centering_geometry():
     eq_(get_centering_geometry(100, 200, 300, 400), "100x200+100+100")
 
 class Tk(Base):
-    """ The specific pyUI for tk.  TODO:  make this pyUI.tk
+    """ The specific pyUI for tk.
 
-     I will heed the advie of http://effbot.org/tkinterbook/grid.htm
+     I will heed the advice of http://effbot.org/tkinterbook/grid.htm
      and remove all pack commands. """
 
     def center_main_window(self, width=990, height=150):
@@ -46,7 +46,7 @@ class Tk(Base):
                    frame (place with all the fields) and
                    some butons """
         super().__init__()
-        print("Running")
+        print("Init of TK")
         self.root = tkinter.Tk()  # not the name of this class.
         self.main = ttk.Frame(self.root)
         self.main.parent = self.root
@@ -73,8 +73,11 @@ class Tk(Base):
         self.main.pack(fill=c.BOTH, expand=1)
         self.center_main_window()
         self.root.mainloop()
-        print("Ran.")
+        print("TK conclude concluede.")
         return self.ok_return
+
+    def dialog(self, values, spec_hints):
+        pass
 
     def cb_copy_coupled_values(self, tk_event):
         """ Callback to copy from vars coupled to widgets to pkUI
@@ -159,6 +162,8 @@ class Tk(Base):
         yield
         # self.section_end("Grid item")
     '''
+
+
 
     @contextmanager
     def list_spec(self, spec):

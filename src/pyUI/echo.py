@@ -104,8 +104,5 @@ class pyUI_echo(pyUI.Base):
         yield
         self.section_end("value")
 
-def test_pyUI_echo_complete():
-    check_valid_pyUI_object(pyUI_echo())
-
 if __name__ == "__main__":
     except_pyUI_usage("You are trying to run the echo module.")
