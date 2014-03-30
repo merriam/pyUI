@@ -1,4 +1,4 @@
-""" PyUI.echo for echoing
+""" PyUI.echo for echoing back the specification.  Primarily a testing aid.
 
 The plan is in docs/plan.md.   Additional comments are in docs/log.md or may the
 git commit messages. """
@@ -9,8 +9,8 @@ from contextlib import contextmanager
 import re
 
 
-class pyUI_echo(pyUI.Base):
-    """ a text/terminal class for pyUI """
+class Echo(pyUI.Base):
+    """ a text echo testing class for pyUI """
 
     def __init__(self):
         """ First step """

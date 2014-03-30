@@ -3,13 +3,15 @@
 import pyUI
 
 def add_two(ui):
-    """ Add two using the pyUI subclass given. """
+    """ Add two using the pyUI subclass given. Returns total.  """
     fields = [["Enter first number:", ":number1 is number"],
               ["Enter second number", ":number2 is number"]]
-    output = ui.dialog(fields)
+    output = ui().dialog(fields)
     if output:
         total = output["number1"] + output["number2"]
         output = ui().dialog("Total value is {}".format(total))
+        return total
+    return None
 
 if __name__ == "__main__":
     print("==== Next up:  Stub ===")

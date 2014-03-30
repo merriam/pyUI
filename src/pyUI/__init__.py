@@ -15,8 +15,11 @@ class except_pyUI_usage(except_pyUI):
     """ When a programmer has called the library incorrectly. """
     pass
 
+
+
 from .base import Base
 from .tk import Tk
 from .stub import Stub
-Echo = Stub
-HTML = Stub
+from .echo import Echo
+# Echo = Stub
+html = Stub
