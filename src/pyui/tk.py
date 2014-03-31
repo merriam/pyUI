@@ -4,7 +4,7 @@
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
-from . import except_pyUI, except_pyUI_usage, Base
+from . import except_pyui, except_pyui_usage, Base
 import tkinter
 import tkinter.constants as c
 import tkinter.ttk as ttk
@@ -21,7 +21,7 @@ def test_get_centering_geometry():
     eq_(get_centering_geometry(100, 200, 300, 400), "100x200+100+100")
 
 class Tk(Base):
-    """ The specific pyUI for tk.
+    """ The specific pyui for tk.
 
      I will heed the advice of http://effbot.org/tkinterbook/grid.htm
      and remove all pack commands. """
@@ -201,4 +201,4 @@ class Tk(Base):
         # self.section_end("value")
 
 if __name__ == "__main__":
-    except_pyUI_usage("You are trying to run the module.")
+    except_pyui_usage("You are trying to run the module.")

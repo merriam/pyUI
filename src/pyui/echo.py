@@ -1,22 +1,22 @@
-""" PyUI.echo for echoing back the specification.  Primarily a testing aid.
+""" pyui.echo for echoing back the specification.  Primarily a testing aid.
 
 The plan is in docs/plan.md.   Additional comments are in docs/log.md or may the
 git commit messages. """
 
-import pyUI
+import pyui
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
 
 
-class Echo(pyUI.Base):
-    """ a text echo testing class for pyUI """
+class Echo(pyui.Base):
+    """ a text echo testing class for pyui """
 
     def __init__(self):
         """ First step """
         super().__init__()
         self.indent = 0
-        self.section_start("pyUI_echo:  Preparing")
+        self.section_start("pyui_echo:  Preparing")
 
     def emit(self, message):
         print("{}{}".format(' ' * self.indent, message))
@@ -36,7 +36,7 @@ class Echo(pyUI.Base):
 
             Returns True on ok, or input accpted, and False on cancel or ignore
             the page.  """
-        self.section_end("pyUI_echo:  Concluding")
+        self.section_end("pyui_echo:  Concluding")
         return True
 
     def add_entry_spec(self, spec):
@@ -105,4 +105,4 @@ class Echo(pyUI.Base):
         self.section_end("value")
 
 if __name__ == "__main__":
-    except_pyUI_usage("You are trying to run the echo module.")
+    except_pyui_usage("You are trying to run the echo module.")

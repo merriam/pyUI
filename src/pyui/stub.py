@@ -4,7 +4,7 @@
 from . import Base
 
 class Stub(Base):
-    """ A stub class for pyUI.  It ignores the spec, and returns
+    """ A stub class for pyui.  It ignores the spec, and returns
         a constant dictionary.   """
     # pylint: disable=abstract-method,no-init
     def dialog(self, spec=None, current_values=None):

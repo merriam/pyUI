@@ -7,11 +7,11 @@ among files later.
 """
 
 #-- Module exceptions
-class except_pyUI(BaseException):
+class except_pyui(BaseException):
     """ Superclass for all custom exceptions from this library """
     pass
 
-class except_pyUI_usage(except_pyUI):
+class except_pyui_usage(except_pyui):
     """ When a programmer has called the library incorrectly. """
     pass
 

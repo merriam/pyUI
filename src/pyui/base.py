@@ -1,14 +1,14 @@
-""" pyUI Base abstract class.
+""" pyui Base abstract class.
 
 This defines the interface for subclasses.
 """
 
 from contextlib import contextmanager
-from . import except_pyUI_usage
+from . import except_pyui_usage
 from .spec import is_grid, is_entry_spec
 
 class Base():
-    """The pyUI gui base abstract class; usable through subclassing.
+    """The pyui gui base abstract class; usable through subclassing.
 
     Its was a tough call to decide subclassing was the correct choice.
     The trade-off of being able over-ride dialog() tipped the scales
@@ -31,11 +31,11 @@ class Base():
         self.values = {}
         self.previous_values = None
         if type(self) == Base:
-            raise except_pyUI_usage("Only instantiate subclasses of Base.")
+            raise except_pyui_usage("Only instantiate subclasses of Base.")
 
     def dialog(self, spec, current_values=None):
         """   main dialog system.
-        self = a subclass of pyUI.
+        self = a subclass of pyui.
         spec = mini-language for fields in dialog,
         current_values = dict of current values for fields
         TODO:  should be a class method
