@@ -15,7 +15,9 @@ class except_pyui_usage(except_pyui):
     """ When a programmer has called the library incorrectly. """
     pass
 
-
+def debug(*args, **kwargs):
+   """ Print debug strings """
+   print("pyui debug:", *args, **kwargs)
 
 from .base import Base
 from .tk import Tk

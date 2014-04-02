@@ -4,7 +4,7 @@
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
-from . import except_pyui, except_pyui_usage, Base
+from . import except_pyui, except_pyui_usage, Base, debug
 import tkinter
 import tkinter.constants as c
 import tkinter.ttk as ttk
@@ -46,7 +46,7 @@ class Tk(Base):
                    frame (place with all the fields) and
                    some butons """
         super().__init__()
-        print("Init of TK")
+        debug("Init of TK")
         self.root = tkinter.Tk()  # not the name of this class.
         self.main = ttk.Frame(self.root)
         self.main.parent = self.root
@@ -73,7 +73,7 @@ class Tk(Base):
         self.main.pack(fill=c.BOTH, expand=1)
         self.center_main_window()
         self.root.mainloop()
-        print("TK conclude concluede.")
+        debug("TK conclude concluede.")
         return self.ok_return
 
     def dialog(self, values, spec_hints):
@@ -86,7 +86,7 @@ class Tk(Base):
             try:
                 value = coupled_value.get()
                 self.values[name] = value
-                print("name ", name, "coupled to", coupled_value,
+                debug("name ", name, "coupled to", coupled_value,
                       "=", value)
             except ValueError:
                 pass  # couldn't convert to int or other value
@@ -98,14 +98,14 @@ class Tk(Base):
         triggered when cursor is in the field, and then OK is
         pressed.
         """
-        print("in ok")
+        debug("in ok")
         self.cb_copy_coupled_values(None)
         self.ok_return = True
         self.main.quit()
 
     def cb_cancel(self):
         """ cancel button """
-        print("in cancel")
+        debug("in cancel")
         self.values = None
         self.ok_return = False
         self.main.quit()
