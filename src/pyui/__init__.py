@@ -19,9 +19,13 @@ def debug(*args, **kwargs):
    """ Print debug strings """
    print("pyui debug:", *args, **kwargs)
 
+
+# The order of these is, unfortunately, important
+from .spec import Spec
 from .base import Base
 from .tk import Tk
 from .stub import Stub
 from .echo import Echo
+
 # Echo = Stub
 html = Stub

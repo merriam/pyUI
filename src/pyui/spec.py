@@ -1,15 +1,12 @@
-""" pyui Module for introspection based UI.
+""" spec, for converting strings into Spec objects.
 
-The plan is in docs/plan.md.   Additional comments are in docs/log.md or may the
-git commit messages. """
+For example, ":number" or ":number like 999".
+Note that parsing it also requires looking at a current value:  we might infer a type.
+"""
 
-# TODO, add module for what gets exported.
-
-
-#====== Spec stuff
-# an Entry_spec, which may be a class later, is the minilanguage describing an entry.
-# For example, ":number" or ":number like 999".
-# Note that parsing it also requires looking at a current value:  we might infer a type.
+from nose.tools import raises, eq_
+from enum import Enum
+from . import except_pyui_usage
 
 PREFIX = ":"
 
@@ -37,8 +34,8 @@ def parse_entry_spec(entry_spec):
 
 def test_parse_entry_spec():
     # TODO:  Check for more than name
-    assert parse_entry_spec(":number")["name"] == "number"
-    assert parse_entry_spec(":number like '999'")["name"] == "number"
+    eq_(parse_entry_spec(":number")["name"], "number")
+    eq_(parse_entry_spec(":number like '999'")["name"],  "number")
 
 
 def is_grid(spec):
@@ -70,3 +67,48 @@ def test_is_simple():
     assert is_simple(None)
     assert not is_simple([])
     assert not is_simple({})
+    assert not is_simple([2,3,4])
+
+class Spec():
+    Kinds = Enum("Kinds", "LABEL ENTRY DICT GRID LIST")
+
+    def __init__(self, spec_thing):
+        """ Create a spec item from whatever is passed to us. """
+        self.value = spec_thing
+        self.kind = None
+        if is_grid(spec_thing):
+            self.kind = self.Kinds.GRID
+        elif isinstance(spec_thing, list):
+            self.kind = self.Kinds.LIST
+        elif isinstance(spec_thing, dict):
+            self.kind = self.Kinds.DICT
+        elif type(spec_thing) is str and is_entry_spec(spec_thing):
+            self.kind = self.Kinds.ENTRY
+            parse = parse_entry_spec(spec_thing)
+            self.value = parse['name']
+        elif type(spec_thing) is str:
+            self.kind = self.Kinds.LABEL
+        else:
+            raise except_pyui_usage("Invalid type: {}".format(type(spec_thing)))
+
+    @classmethod
+    def new_label(cls, label):
+        """ Create a new label spec item from the passed string. """
+        return cls.__init__(label)
+
+def test_spec_simples():
+   spec = Spec("Enter first number:")
+   eq_(spec.value, "Enter first number:")
+   eq_(spec.kind, Spec.Kinds.LABEL)
+
+   spec = Spec(":number1")
+   eq_(spec.value, "number1")
+   eq_(spec.kind, Spec.Kinds.ENTRY)
+
+   spec = Spec(":number1 is an int from 0 to 10")
+   eq_(spec.value, "number1")
+   eq_(spec.kind, Spec.Kinds.ENTRY)
+
+@raises(except_pyui_usage)
+def test_spec_number():
+    Spec(3)

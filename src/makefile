@@ -2,7 +2,7 @@
 # Note 'all' must be the first target so a bare '$ make' does 'all'.
 # Note the '@' at the beginning of @echo means don't display command
 
-all:   environment lint tests
+all:   environment tests
 	@echo "All tests pass"
 
 test_pass:

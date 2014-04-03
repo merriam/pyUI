@@ -1,9 +1,9 @@
 """ pyui.echo for echoing back the specification.  Primarily a testing aid.
 
-The plan is in docs/plan.md.   Additional comments are in docs/log.md or may the
-git commit messages. """
+"""
 
 import pyui
+from . import Spec
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
@@ -16,18 +16,52 @@ class Echo(pyui.Base):
         """ First step """
         super().__init__()
         self.indent = 0
-        self.section_start("pyui_echo:  Preparing")
 
     def emit(self, message):
-        print("{}{}".format(' ' * self.indent, message))
+        """ This is the only output of this class. """
+        p = print
+        p("{:2}:{}{}".format(self.indent, ' ' * self.indent, message))
 
-    def section_start(self, message):
+    @contextmanager
+    def section(self, message):
+        """ emit the section hearder and footer """
         self.emit(">{}".format(message))
         self.indent += 1
-
-    def section_end(self, message):
+        yield
         self.indent -= 1
         self.emit("<{}".format(message))
+
+    def add_item_dict(self, spec):
+        with self.section("Dict with {} keys".format(len(spec.v))):
+            keys = spec.value.keys()
+            if type(spec.v) is dict:
+                keys= sorted(keys)  # sort keys only if a basic dict.
+                for key in keys:
+                    value = spec.value[key]
+                    self.add_item(Spec.new_label(key))
+                    self.add_item(Spec(value))
+
+    def add_item_grid(self, spec):
+        with self.section("Grid with {} rows and {} columns".format(
+                  len(spec.value), len(spec.value[0]))):
+            for row_num, row in enumerate(spec.value):
+                with self.section("grid row {}".format(row_num)):
+                    for col_num, cell in enumerate(row):
+                        with self.section("grid item at ({}, {})".format(
+                                row_num, col_num)):
+                            self.add_item(Spec(cell))
+
+    def add_item_list(self, spec):
+        with self.section("List with {} rows".format(len(spec.value))):
+            for row_num, row in enumerate(spec.value):
+                with self.section("list item {}".format(row_num)):
+                    self.add_item(Spec(row))
+
+    def add_item_label(self, spec):
+        self.emit("Adding label {}".format(spec.value))
+
+    def add_item_entry(self, spec):
+        self.emit("Adding entry {}".format(spec.value))
 
     def conclude(self):
         """ Execute, after dialog adds all fields.  Sets self.values dict
@@ -36,7 +70,6 @@ class Echo(pyui.Base):
 
             Returns True on ok, or input accpted, and False on cancel or ignore
             the page.  """
-        self.section_end("pyui_echo:  Concluding")
         return True
 
     def add_entry_spec(self, spec):
@@ -46,63 +79,6 @@ class Echo(pyui.Base):
     def add_data_spec(self, spec):
         """ Add a data spec, e.g., a label. """
         self.emit("::{}".format(spec))
-
-    @contextmanager
-    def grid_spec(self, spec):
-        """ Context manager when adding an entire grid. """
-        self.section_start("Grid spec")
-        yield
-        self.section_end("Grid spec")
-
-    @contextmanager
-    def grid_row(self, spec):
-        """ Context manager when adding a row to a grid. """
-        self.section_start("Grid row")
-        yield
-        self.section_end("Grid row")
-
-    @contextmanager
-    def grid_item(self, spec):
-        """ Context manager when adding an item to a grid,
-            meaning one cell of one row. """
-        self.section_start("Grid item")
-        yield
-        self.section_end("Grid item")
-
-    @contextmanager
-    def list_spec(self, spec):
-        """ Context manager when adding a list . """
-        self.section_start("List spec")
-        yield
-        self.section_end("List spec")
-
-    @contextmanager
-    def list_item(self, spec):
-        """ Context manager when adding a single item on a list. """
-        self.section_start("List item")
-        yield
-        self.section_end("List item")
-
-    @contextmanager
-    def dict_spec(self, spec):
-        """ Context manager when adding a dict. """
-        self.section_start("dict spec")
-        yield
-        self.section_end("dict spec")
-
-    @contextmanager
-    def dict_key_value(self, key, value):
-        """ Context manager when adding a key, value pair to a dict. """
-        self.section_start("key value")
-        yield
-        self.section_end("key value")
-
-    @contextmanager
-    def dict_value(self, value):
-        """ Context manager when adding just the dict_value. """
-        self.section_start("value")
-        yield
-        self.section_end("value")
 
 if __name__ == "__main__":
     except_pyui_usage("You are trying to run the echo module.")
