@@ -112,3 +112,18 @@ def test_spec_simples():
 @raises(except_pyui_usage)
 def test_spec_number():
     Spec(3)
+
+def test_spec_collections():
+    spec = Spec([1, 2, "buckle my shoe"])
+    eq_(spec.value, [1, 2, "buckle my shoe"])
+    eq_(spec.kind, Spec.Kinds.LIST)
+
+    g = [ [ 'a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i'] ]
+    spec = Spec(g)
+    eq_(spec.value, g)
+    eq_(spec.kind, Spec.Kinds.GRID)
+
+    h = { "hash": 1, "is": 2, "for": 5, "eggs": 'foobar' }
+    spec = Spec(h)
+    eq_(spec.value, h)
+    eq_(spec.kind, Spec.Kinds.DICT)
