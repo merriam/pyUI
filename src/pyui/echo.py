@@ -11,6 +11,7 @@ import re
 
 class Echo(pyui.Base):
     """ a text echo testing class for pyui """
+    print_ = print  # for easy overriding
 
     def __init__(self):
         """ First step """
@@ -19,8 +20,7 @@ class Echo(pyui.Base):
 
     def emit(self, message):
         """ This is the only output of this class. """
-        p = print
-        p("{:2}:{}{}".format(self.indent, ' ' * self.indent, message))
+        self.print_("{:2}:{}{}".format(self.indent, ' ' * self.indent, message))
 
     @contextmanager
     def section(self, message):
