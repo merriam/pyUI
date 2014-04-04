@@ -7,20 +7,30 @@ from . import Spec
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
+from io import StringIO
 
 
 class Echo(pyui.Base):
-    """ a text echo testing class for pyui """
-    print_ = print  # for easy overriding
+    """a text echo testing class for pyui.
 
+    This class stretches the contract a bit, in that the return value
+is just a string with the debug echo of parsing up the spec.  Later,
+it may be that plus some default values, depending on the tests that
+should be written.
+
+    """
     def __init__(self):
         """ First step """
         super().__init__()
         self.indent = 0
+        self.emit_io = StringIO()
+        self.values["echo"] = ""
 
     def emit(self, message):
         """ This is the only output of this class. """
-        self.print_("{:2}:{}{}".format(self.indent, ' ' * self.indent, message))
+        print("{:2}:{}{}".format(self.indent, ' ' * self.indent, message),
+               file=self.emit_io)
+        self.values["echo"] = self.emit_io.getvalue()
 
     @contextmanager
     def section(self, message):
@@ -62,6 +72,7 @@ class Echo(pyui.Base):
 
     def add_item_entry(self, spec):
         self.emit("Adding entry {}".format(spec.value))
+        self.values[spec.value] = 0  # hack, need to know type.
 
     def conclude(self):
         """ Execute, after dialog adds all fields.  Sets self.values dict

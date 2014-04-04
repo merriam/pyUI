@@ -8,6 +8,8 @@ def add_two(ui):
               ["Enter second number", ":number2 is number"]]
     output = ui().dialog(fields)
     if output:
+        if "echo" in output:
+            print(output["echo"])   # show the debug echo
         total = output["number1"] + output["number2"]
         output = ui().dialog("Total value is {}".format(total))
         return total
