@@ -29,7 +29,8 @@ class Example(Frame):
         # styles are 'clam' 'default' 'alt' or 'classic', but so far seem the same
 
         frame = Frame(self, relief=RAISED, borderwidth=1)
-        frame = Frame(self)
+        # border width of one means the effect is subtle; it really just
+        # puts a line between the top section and the bottom buttons
         frame.pack(fill=BOTH, expand=1)
         # this frame has nothing, but pushes buttons down
 
