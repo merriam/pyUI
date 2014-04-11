@@ -3,11 +3,20 @@
 from tkinter import *
 from tkinter import ttk
 
+#  root
+#    content (ttk.Frame) uses grid -- nonresizing whole thing.
+#       one, two, three
+#       ok, cancel
+#       namelbl, name
+#       frame (ttk.Frame) -- sunken border part.
 root = Tk()
 
 # Adding syle affects if it displays!
 #style = ttk.Style().configure('My.TFrame', background=red)
 content = ttk.Frame(root)
+
+
+
 frame = ttk.Frame(content, borderwidth=5, relief="sunken", width=200, height=100)
 namelbl = ttk.Label(content, text="Name")
 name = ttk.Entry(content)
@@ -35,4 +44,7 @@ three.grid(column=2, row=3)
 ok.grid(column=3, row=3)
 cancel.grid(column=4, row=3)
 
+hello = ttk.Label(frame, text= "Hello")
+hello.grid(column=1, row=1)
+ttk.Label(frame, text="Goodbye").grid(column=2, row=2)
 root.mainloop()
