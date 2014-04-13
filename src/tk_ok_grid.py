@@ -26,12 +26,12 @@ def get_geometry(window):
     return coords
 
 
-def center_window(top, width=290, height=150):
+def center_window(top):
     """ Center top level window in screen
 
     Might be imperfect, see discussion at
     http://stackoverflow.com/questions/3352918
-"""
+    """
     screen_width = top.winfo_screenwidth()
     screen_height = top.winfo_screenheight()
 
@@ -70,14 +70,14 @@ def main():
     # directions.  Expand the space even if the (nonexistant) widgets in
     # the frame don't need it.
 
+    # I will heed the advice of http://effbot.org/tkinterbook/grid.htm
+    # and put a content_frame, which uses the grid packing, inside the
+    # frame_above, which uses a flow packing.
 
     content_frame = tk.Frame(frame_above, bg="purple")
     tk.Label(content_frame, text="Hello").grid(row=10, column=10)
     tk.Label(content_frame, text="Goodbye").grid(row=20, column=20)
     content_frame.pack(fill=tk.BOTH, expand=1)
-
-
-
 
     button_frame = tk.Frame(root, bg="blue")
     button_frame.pack(fill=tk.X)

@@ -57,7 +57,8 @@ class Base():
         """ Add spec to current window or frame.
 
         Note that this can be recursive in that adding a collection will
-        in turn call this routine for each item. """
+        in turn call this routine for each item.
+        Yes, this feels like ugly code ripe for inherience. """
 
         if spec.kind is Spec.Kinds.ENTRY:
             self.add_item_entry(spec)

@@ -20,8 +20,8 @@ if __name__ == "__main__":
     add_two(pyui.Stub)
     print("==== Next up:  Echo ====")
     add_two(pyui.Echo)
-    #print("==== Next up:  Tk ====")
-    #add_two(pyui.tk)
+    print("==== Next up:  Tk ====")
+    add_two(pyui.Tk)
     #print("==== Next up:  Flask ====")
     #add_two(pyui.flask)
 

@@ -1,118 +1,133 @@
 """ tk.py tk subclass for tcl/tk ui.
+    python3, of course.
 """
 
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
-from . import except_pyui, except_pyui_usage, Base, debug
-import tkinter
+from . import except_pyui, except_pyui_usage, Base, debug, spec
+import tkinter as tk
 import tkinter.constants as c
 import tkinter.ttk as ttk
+# note that tk and ttk share many names
 from .spec import parse_entry_spec
 
-def get_centering_geometry(width, height, screen_width, screen_height):
-    """ return geometry string for given window and screen size """
+# Some handy tk utilities
+def get_geometry(window):
+    """ return window geometry as list of xpos, ypos, xwidth, ywidth """
+    top.update_idletasks()
+    # update_idle_tasks does geometry packing pending w/o callbacks
+    # failure to call this means that geometry() tends to return a
+    # a size of 1x1.   Why window.geometry() doesn't just call it is one
+    # of those broken software things.
+    geom = window.geometry()
+    coord_strings = re.match('(\d+)x(\d+)\+(\d+)\+(\d+)', geom).groups()
+    coords= [int(c) for c in coord_strings]
+    return coords
+
+
+def center_window(top):
+    """ Center top level window in screen
+
+    Might be imperfect, see discussion at
+    http://stackoverflow.com/questions/3352918
+"""
+    screen_width = top.winfo_screenwidth()
+    screen_height = top.winfo_screenheight()
+
+    width, height, old_x, old_y = get_geometry(top)
+
     new_x = (screen_width - width) // 2
     new_y = (screen_height - height) // 2
-    return '{}x{}+{}+{}'.format(width, height, new_x, new_y)
+    geom = '{}x{}+{}+{}'.format(width, height, new_x, new_y)
+    print("new geometry:", geom)
+    top.geometry(geom)
 
-def test_get_centering_geometry():
-    eq_(get_centering_geometry(100, 100, 400, 400), "100x100+150+150")
-    eq_(get_centering_geometry(100, 200, 300, 400), "100x200+100+100")
+
+def raise_window(window):
+    """ raise window over other application windows.
+
+    http://stackoverflow.com/questions/1892339/make-tkinter-jump-to-the-front
+    """
+    window.attributes('-topmost', 1)
+    window.attributes('-topmost', 0)
+
+###
+
 
 class Tk(Base):
     """ The specific pyui for tk.
 
-     I will heed the advice of http://effbot.org/tkinterbook/grid.htm
-     and remove all pack commands. """
-
-    def center_main_window(self, width=990, height=150):
-        """ center parent window in screen.
-
-        Might only work after packing the window, unclear. """
-        width = self.root.winfo_reqwidth()
-        height = self.root.winfo_reqheight()
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        self.root.geometry(get_centering_geometry(width, height,
-                            screen_width, screen_height))
+    Ah, the curse of inheritence.  I think it actually the
+    right choice here.  """
 
     # pylint: disable=super-on-old-class
     # pylint is buggy
     def __init__(self):
-        """ Prepare, once befoer a dialog
+        """ Prepare tableau, once before a dialog
             root (windowing system) has
-               main (visible window space) has
-                   frame (place with all the fields) and
-                   some butons """
+               top_frame (where content goes) and
+               bottom_frame (where buttons go)
+        """
         super().__init__()
-        debug("Init of TK")
-        self.root = tkinter.Tk()  # not the name of this class.
-        self.main = ttk.Frame(self.root)
-        self.main.parent = self.root
-        self.root.title("Python!")
-        self.main.style = ttk.Style()
-        self.main.style.theme_use("default")
-        # themes should be 'clam', 'alt', 'classic', and 'default' but
-        # I haven't seen a change between these styles.
-        self.frame = ttk.Frame(self.root, relief=c.RAISED, borderwidth=1)
-        self.coupled_entries = {}
-        # see python.org/3.0/library/tkinter.html#coupling-widget-variables
-        self.ok_return = True
+        self.root = tk.Tk()  # different Tk than this class.
+        self.root.title("Python Pyui!")
+
+        self.top_frame = tk.Frame(self.root, bg="yellow")
+        self.top_frame.pack(fill=tk.BOTH, expand=1)
+        self.bottom_frame = tk.Frame(self.root, bg="blue",
+                                     borderwidth=1, relief=tk.RAISED)
+        okButton = tk.Button(self.bottom_frame, text="OK",
+                             command=self.cb_ok)
+        okButton.pack(fill='none', expand=1, side=c.RIGHT)
+        cancelButton = tk.Button(self.bottom_frame, text="Cancel",
+                                  command=self.cb_cancel)
+        cancelButton.pack(fill='none', expand=1, side=c.RIGHT)
+        self.ok_return = True  # ???
 
     def conclude(self):
-        """After adding the fields, this add cancel and OK buttons, Execute
-        main loop of system and prepare self.values.
+        """Execute main loop of system and prepare self.values.
+
+        This should be done after init and adding fields, of course.
         """
-        self.frame.pack(fill=c.BOTH, expand=1)
-        okButton = ttk.Button(self.main, text="OK", command=self.cb_ok)
-        cancelButton = ttk.Button(self.main, text="Cancel",
-                                  command=self.cb_cancel)
-        okButton.pack(fill='none', expand=1, side=c.RIGHT)
-        cancelButton.pack(fill='none', expand=1, side=c.RIGHT)
-        self.main.pack(fill=c.BOTH, expand=1)
-        self.center_main_window()
+        center_main_window(self.root)
+        raise_window(self.root)
         self.root.mainloop()
-        debug("TK conclude concluede.")
+        debug("TK concluded.")
         return self.ok_return
 
-    def dialog(self, values, spec_hints):
+    def dialog(self, spec):
         pass
 
-    def cb_copy_coupled_values(self, tk_event):
-        """ Callback to copy from vars coupled to widgets to pkUI
-        super class .values for return. """
-        for name, coupled_value in self.coupled_entries.items():
-            try:
-                value = coupled_value.get()
-                self.values[name] = value
-                debug("name ", name, "coupled to", coupled_value,
-                      "=", value)
-            except ValueError:
-                pass  # couldn't convert to int or other value
-
     def cb_ok(self):
-        """on OK button.
+        """on OK button, copy into self.values hash.
 
         Note that no known callback triggered on field
         triggered when cursor is in the field, and then OK is
         pressed.
         """
         debug("in ok")
-        self.cb_copy_coupled_values(None)
+        self.values = None # ??? fix me
         self.ok_return = True
-        self.main.quit()
+        self.root.quit()  # end mainloop
 
     def cb_cancel(self):
         """ cancel button """
         debug("in cancel")
         self.values = None
         self.ok_return = False
-        self.main.quit()
+        self.root.quit()  # end mainloop
 
-    def add_entry_spec(self, entry_spec):
+    def add_item_dict(self, the_spec): pass
+    def add_item_grid(self, the_spec): pass
+    def add_item_list(self, the_spec): pass
+    def add_item_label(self, the_spec): pass
+    def add_item_entry(self, the_spec):
         """ Add an input entry, e.g., a string to fill in.  """
-        parse = parse_entry_spec(entry_spec)
+        debug("Adding entry {}".format(Spec))
+        return
+        """
+        parse = parse_entry_spec(the_spec)
         name = parse["name"]
         var = tkinter.IntVar()
         entry = ttk.Entry(textvariable=var)
@@ -122,83 +137,16 @@ class Tk(Base):
         entry.bind("<Enter>", self.cb_copy_coupled_values)
         entry.pack()
         self.coupled_entries[name] = var
+        """
 
-    def add_data_spec(self, spec):
+    def add_data_spec(self, the_spec):
         """ Add a data spec, e.g., a label. """
+        return
+        """
         a_label = ttk.Label(self.frame, text=spec)
         a_label.pack(fill=c.BOTH, expand=1)
         # self.emit("::{}".format(spec))
-
-    '''
-    @contextmanager
-    def grid_spec(self, spec):
-        """ Context manager when adding an entire grid.
-
-         """
-        # First, add a frame, because mixing grids directly causes
-        # all sorts of problems for tk layout managers.
-        new_frame = ttk.Frame(self.frame)
-        # It's a class, so I'm going to dump data I want isolated on the stack here.
-        new_frame._next_row = 0
-        new_frame._next_col = 0
-        new_grid = Grid()
-        saved_frame = self.frame
-        self.frame = new_frame
-        yield
-        self.frame = saved_frame
-
-    @contextmanager
-    def grid_row(self, spec):
-        """ Context manager when adding a row to a grid. """
-        # self.section_start("Grid row")
-        yield
-        # self.section_end("Grid row")
-
-    @contextmanager
-    def grid_item(self, spec):
-        """ Context manager when adding an item to a grid,
-            meaning one cell of one row. """
-        # self.section_start("Grid item")
-        yield
-        # self.section_end("Grid item")
-    '''
-
-
-
-    @contextmanager
-    def list_spec(self, spec):
-        """ Context manager when adding a list . """
-        # self.section_start("List spec")
-        yield
-        # self.section_end("List spec")
-
-    @contextmanager
-    def list_item(self, spec):
-        """ Context manager when adding a single item on a list. """
-        # self.section_start("List item")
-        yield
-        # self.section_end("List item")
-
-    @contextmanager
-    def dict_spec(self, spec):
-        """ Context manager when adding a dict. """
-        # self.section_start("dict spec")
-        yield
-        # self.section_end("dict spec")
-
-    @contextmanager
-    def dict_key_value(self, key, value):
-        """ Context manager when adding a key, value pair to a dict. """
-        # self.section_start("key value")
-        yield
-        # self.section_end("key value")
-
-    @contextmanager
-    def dict_value(self, value):
-        """ Context manager when adding just the dict_value. """
-        # self.section_start("value")
-        yield
-        # self.section_end("value")
+        """
 
 if __name__ == "__main__":
     except_pyui_usage("You are trying to run the module.")
