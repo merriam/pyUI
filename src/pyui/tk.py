@@ -59,7 +59,12 @@ class Tk(Base):
     """ The specific pyui for tk.
 
     Ah, the curse of inheritence.  I think it actually the
-    right choice here.  """
+    right choice here.
+
+    Tk is a bit odd.  Inside a grid, I cannot pack.   Outside
+    a grid, I must pack.  Each item must know its current parent.
+    All sorts of messes.
+"""
 
     # pylint: disable=super-on-old-class
     # pylint is buggy
@@ -86,6 +91,8 @@ class Tk(Base):
 
         self.not_cancelled = False
         self.current_parent = self.top_frame
+        self.parent_is_grid= False
+        self.entries = {}
 
     def conclude(self):
         """Execute main loop of system and prepare self.values.
@@ -106,7 +113,9 @@ class Tk(Base):
         pressed.
         """
         debug("in ok")
-        self.values = None # ??? fix me
+        self.values = {}
+        for entry_name, entry in self.entries.items():
+            self.values[entry_name] = int(entry.get())
         self.not_cancelled = True
         self.root.quit()  # end mainloop
 
@@ -121,10 +130,13 @@ class Tk(Base):
 
     def add_item_grid(self, the_spec):
         debug("Adding grid {}".format(the_spec))
-        parent = self.current_parent
-        content_frame = tk.Frame(parent, bg="purple")
+        old_parent = self.current_parent
+        old_parent_is_grid= self.parent_is_grid
+
+        content_frame = tk.Frame(old_parent, bg="purple")
         self.current_parent = content_frame
         self.current_parent.pack()
+        self.parent_is_grid = True
 
         size= len(the_spec.value)
         for row in range(size):
@@ -133,7 +145,8 @@ class Tk(Base):
                 cell_spec = Spec(cell)
                 widget = self.add_item(cell_spec)
                 widget.grid(row=row, column=col)
-        self.current_parent = parent
+        self.current_parent = old_parent
+        self.parent_is_grid = old_parent_is_grid
         return content_frame
 
 
@@ -141,14 +154,17 @@ class Tk(Base):
 
     def add_item_label(self, the_spec):
         label = tk.Label(self.current_parent, text = the_spec.value)
-        #label.pack()
+        if not self.parent_is_grid:
+            label.pack()
         return label
 
     def add_item_entry(self, the_spec):
         """ Add an input entry, e.g., a string to fill in.  """
         debug("Adding entry {}".format(the_spec))
         entry = tk.Entry(self.current_parent)
-        #entry.pack()
+        self.entries[the_spec.value] = entry
+        if not self.parent_is_grid:
+            entry.pack()
         return entry
 
 if __name__ == "__main__":
