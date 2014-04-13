@@ -5,7 +5,7 @@
 from nose.tools import raises, eq_
 from contextlib import contextmanager
 import re
-from . import except_pyui, except_pyui_usage, Base, debug, spec
+from . import except_pyui, except_pyui_usage, Base, debug, Spec
 import tkinter as tk
 import tkinter.constants as c
 import tkinter.ttk as ttk
@@ -15,7 +15,7 @@ from .spec import parse_entry_spec
 # Some handy tk utilities
 def get_geometry(window):
     """ return window geometry as list of xpos, ypos, xwidth, ywidth """
-    top.update_idletasks()
+    window.update_idletasks()
     # update_idle_tasks does geometry packing pending w/o callbacks
     # failure to call this means that geometry() tends to return a
     # a size of 1x1.   Why window.geometry() doesn't just call it is one
@@ -72,32 +72,31 @@ class Tk(Base):
         super().__init__()
         self.root = tk.Tk()  # different Tk than this class.
         self.root.title("Python Pyui!")
-
         self.top_frame = tk.Frame(self.root, bg="yellow")
-        self.top_frame.pack(fill=tk.BOTH, expand=1)
+        self.top_frame.pack(fill=c.BOTH, expand=1)
         self.bottom_frame = tk.Frame(self.root, bg="blue",
-                                     borderwidth=1, relief=tk.RAISED)
+                                     borderwidth=1, relief=c.RAISED)
+        self.bottom_frame.pack(fill=c.X)
         okButton = tk.Button(self.bottom_frame, text="OK",
                              command=self.cb_ok)
-        okButton.pack(fill='none', expand=1, side=c.RIGHT)
+        okButton.pack(fill='none', padx=5, pady=5, side=c.RIGHT)
         cancelButton = tk.Button(self.bottom_frame, text="Cancel",
                                   command=self.cb_cancel)
-        cancelButton.pack(fill='none', expand=1, side=c.RIGHT)
-        self.ok_return = True  # ???
+        cancelButton.pack(fill='none', padx=5, pady=5, side=c.RIGHT)
+
+        self.not_cancelled = False
+        self.current_parent = self.top_frame
 
     def conclude(self):
         """Execute main loop of system and prepare self.values.
 
         This should be done after init and adding fields, of course.
         """
-        center_main_window(self.root)
         raise_window(self.root)
+        center_window(self.root)
         self.root.mainloop()
         debug("TK concluded.")
-        return self.ok_return
-
-    def dialog(self, spec):
-        pass
+        return self.not_cancelled
 
     def cb_ok(self):
         """on OK button, copy into self.values hash.
@@ -108,45 +107,49 @@ class Tk(Base):
         """
         debug("in ok")
         self.values = None # ??? fix me
-        self.ok_return = True
+        self.not_cancelled = True
         self.root.quit()  # end mainloop
 
     def cb_cancel(self):
         """ cancel button """
         debug("in cancel")
         self.values = None
-        self.ok_return = False
+        self.not_cancelled = False
         self.root.quit()  # end mainloop
 
     def add_item_dict(self, the_spec): pass
-    def add_item_grid(self, the_spec): pass
+
+    def add_item_grid(self, the_spec):
+        debug("Adding grid {}".format(the_spec))
+        parent = self.current_parent
+        content_frame = tk.Frame(parent, bg="purple")
+        self.current_parent = content_frame
+        self.current_parent.pack()
+
+        size= len(the_spec.value)
+        for row in range(size):
+            for col in range(size):
+                cell = the_spec.value[row][col]
+                cell_spec = Spec(cell)
+                widget = self.add_item(cell_spec)
+                widget.grid(row=row, column=col)
+        self.current_parent = parent
+        return content_frame
+
+
     def add_item_list(self, the_spec): pass
-    def add_item_label(self, the_spec): pass
+
+    def add_item_label(self, the_spec):
+        label = tk.Label(self.current_parent, text = the_spec.value)
+        #label.pack()
+        return label
+
     def add_item_entry(self, the_spec):
         """ Add an input entry, e.g., a string to fill in.  """
-        debug("Adding entry {}".format(Spec))
-        return
-        """
-        parse = parse_entry_spec(the_spec)
-        name = parse["name"]
-        var = tkinter.IntVar()
-        entry = ttk.Entry(textvariable=var)
-
-        if self.previous_values and name in self.previous_values:
-            var.set(self.previous_values[name])
-        entry.bind("<Enter>", self.cb_copy_coupled_values)
-        entry.pack()
-        self.coupled_entries[name] = var
-        """
-
-    def add_data_spec(self, the_spec):
-        """ Add a data spec, e.g., a label. """
-        return
-        """
-        a_label = ttk.Label(self.frame, text=spec)
-        a_label.pack(fill=c.BOTH, expand=1)
-        # self.emit("::{}".format(spec))
-        """
+        debug("Adding entry {}".format(the_spec))
+        entry = tk.Entry(self.current_parent)
+        #entry.pack()
+        return entry
 
 if __name__ == "__main__":
     except_pyui_usage("You are trying to run the module.")

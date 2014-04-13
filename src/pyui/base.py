@@ -61,15 +61,15 @@ class Base():
         Yes, this feels like ugly code ripe for inherience. """
 
         if spec.kind is Spec.Kinds.ENTRY:
-            self.add_item_entry(spec)
+            return self.add_item_entry(spec)
         elif spec.kind is Spec.Kinds.LABEL:
-            self.add_item_label(spec)
+            return self.add_item_label(spec)
         elif spec.kind is Spec.Kinds.GRID:
-            self.add_item_grid(spec)
+            return self.add_item_grid(spec)
         elif spec.kind is Spec.Kinds.LIST:
-            self.add_item_list(spec)
+            return self.add_item_list(spec)
         elif spec.kind is Spec.Kinds.DICT:
-            self.add_item_dict(spec)
+            return self.add_item_dict(spec)
         else:
             raise except_pyui_usage("Odd kind {}".format(spec.kind))
 

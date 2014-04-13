@@ -91,6 +91,9 @@ class Spec():
         else:
             raise except_pyui_usage("Invalid type: {}".format(type(spec_thing)))
 
+    def __str__(self):
+        return "Spec kind:{}  value:{}".format(self.kind, self.value)
+
     @classmethod
     def new_label(cls, label):
         """ Create a new label spec item from the passed string. """
