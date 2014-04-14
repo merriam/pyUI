@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/merriam/pyui.svg?branch=master)](https://travis-ci.org/merriam/pyui)
+
 Plan for PyUI
 --
 
