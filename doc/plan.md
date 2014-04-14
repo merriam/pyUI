@@ -3,8 +3,8 @@
 Plan for PyUI
 --
 
-This is an itch I've been wanting to scratch for a while.  I want a different UI.  This should have major innovations in the
-following areas:
+This is an itch I've been wanting to scratch for a while.  I want a
+different UI.  This should have major innovations in the following areas:
 
 * same or near same interface to Tck/Tk, Terminal, HTML, MS-Windows, OS/X,
   Ipad, iPhone, and Android.  Maybe even Glade, wxWindows, and Qt.
