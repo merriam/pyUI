@@ -18,7 +18,7 @@ test_fail:
 tests:  test_pass nosetest test_add_two
 
 nosetest:  environment
-	nosetests add_two.py test*.py pyUI/*.py
+	nosetests test*.py pyUI/*.py
 
 environment:
 	# Yes, I hardcoded this path; makes life simple right now.

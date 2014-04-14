@@ -1,0 +1,17 @@
+language: python
+python:
+  - "3.4"
+
+#TODO:  try for 2.7
+
+# command to install dependencies
+# http://about.travis-ci.org/docs/user/build-configuration/#Installing-Packages-Using-apt
+before_install:
+  - sudo apt-get update -qq
+#  - echo "BEFORE INSTALL"
+#  - sudo apt-get install -qq libgtk2.0-dev libgtkglextmm-x11-1.2-dev # libgtkmm-2.4-dev
+install:
+  - echo "IN INSTALL"
+script:
+  - cd src; make nosetest
+# Just run headless unittests.
