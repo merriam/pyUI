@@ -1,34 +1,35 @@
 Plan for PyUI
 --
 
-This is an itch I've been wanting to scratch for a while.   I want a introspection based GUI.
+This is an itch I've been wanting to scratch for a while.  I want a
+introspection based GUI.  This should have major innovations in the
+follwoing areas:
+
+* same or near same interface to Tck/Tk, Terminal, HTML, MS-Windows, OS/X,
+  Ipad, iPhone, and Android.  Maybe even Glade, wxWindows, and Qt.
+* availability of non-blocking UI items, meaning a dialog where the event
+  loop doesn't take over the applicaiton.  Call to get values and have it
+  return.
+* Lazy specification with smart layouts.  I should be able to toss over raw
+  data, english phrases to parse, or raw data and get something reasonable.
+* Smart data types, not just 'int' but 'year' or 'counting number' or
+  'modern year' or something.  Also, SSN, real addresses, phone numbers,
+  zip codes, etc.
+* A general tone of kicking all possible work to the library instead of the
+  developer.  Treating the input as a puzzle that could be worked out by
+  the library cuts down on the client's need to puzzle out a specific
+  interface.
 
 In the simplest form, I'll have a non-blocking dialog type gui:
 
      import pyUI as ui
-     fields = [["Enter first number:", "{[number1]:d}"],
-               ["Enter second number", "{[number2]:d}"]]
+     fields = [["Enter first number:", ":number1 is integer"],
+               ["Enter second number", ":number2 is integer"]]
      output = ui.dialog(fields)
      total = output["number1"] + output["number2"]
      output = ui.dialog("Total value is {}".format(total))
 
 
-There is enough information here to do a simple Tcl/TK system.  I'm using the mini-language
-for format for specifying the inputs.
+There is enough information here to do a simple Tcl/TK system, so it should be enough for the library to run.
 
-So, in a bit more depth, I'm looking at design with these major terms:
-
-Spec: The description of what items of data are wanted.  The spec is
-recursives, in that a data item might be iteself a list of items.
-This implies an iterator that may return new spec objects.  The spec
-is also might have lists of lists of dicts of lists.  Determining the
-data items requested from a raw spec is a puzzle: there might be
-english phrases; sample values; or other hints.  Treating it like a
-puzzle burdens the ui system programmer instead of the client.  In a
-perfect implementation, any call to the library that could be figured
-out by a human should work.
-
-BaseUI: The abstract base UI of the system on which specific
-subclasses will implement the display for HTML, Tcl/Tk, or other systems.   It should have then contract that each subclass must implement.
-
-Other files are experiments, examples, and docs.
+To understand in a bit more depth, read the [Glossary](DEVELOP.md) and other sections of [the development guide](DEVELOP.md).

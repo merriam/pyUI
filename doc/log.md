@@ -1,3 +1,24 @@
+Monday, April 14, 2014
+=============
+
+It's time to look at design a bit more.  I've been kludging together
+the Tcl/Tk interface and just starting on the radically different HTML
+one.  I'm not trying for good code; I'm trying for code that will
+teach me the problem space most completely.  For example, the Base
+superclass/Tk subclass split isn't right, but I can't be sure what is
+right until I finish the HTML look.
+
+It's odd that I look at the March 19 checklist and find that I did
+break out packages, understand the tk grids, made a testing subclass,
+write a grid example.  The other items are still on my queue and I am
+actively avoiding those items with low risk.
+
+In the short term, I'll bring up Travis CI to get some build clarity,
+look at the Futures project for 2.x, 3.x compatibility, and figure out
+the HTML version.
+
+
+
 Wednesday, March 19, 2014
 ===
 

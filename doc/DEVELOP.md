@@ -12,9 +12,16 @@ Glossary
   entry field, a text field, or it might be a collection of additional
   data items, i.e., a grid, an array, or a dictionary.
 
-**Spec**:   a specification for data item.  If the data item is a collection,
-then the spe will have an iterator for items in the spec.
+**Prespec**: a shorthand name for a string that is an unparsed spec.
+  A prespec might be ":number is integer" which can be turned into a
+  spec, or instance of the Spec class.  The language of the prespec is
+  likely to be ambiguous.
 
+**Spec**: a specification for data item, of the class Spec.  This may
+  be a terminal item, such as a label or entry item.  Alternately, it
+  may be a collection.  It allowable for a collection Spec to have a
+  value that is a prespec.  For example, a dictionary's spec might have
+  values that will be parsed just before adding them to the gui.
 
 Orientation
 ---
@@ -34,3 +41,5 @@ Key Classes
 ---
 
 Base:   PyUI abstract base class for UIs.  It has subclasses for each specific UI system, e.g., Echo, Tk, Text, etc.
+
+Spec:  The compiled spec.
